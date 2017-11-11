@@ -9,7 +9,7 @@ import pymongo
 class LoginForm(Form):
     """Login form to access writing and settings pages"""
 
-    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('email', validators=[DataRequired()])
 
     password = PasswordField('Password', validators=[DataRequired()])
 
