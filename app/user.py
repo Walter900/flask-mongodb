@@ -6,7 +6,9 @@ def encrypt_passowrd(password):
 
 class User():
 
-    def __init__(self):
+    def __init__(self, username):
+        self.username = username
+        #self.email = None
         self.db = pymongo.MongoClient("localhost", 27017)['blog'].users
 
     def new_user(self, username, email, password):
