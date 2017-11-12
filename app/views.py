@@ -16,7 +16,7 @@ def login():
     if request.method == 'POST' and form.validate_on_submit():
         user = app.config['USERS_COLLECTION'].find_one({"email": form.email.data})      
         if user and User.validate_login(user['password'], form.password.data):
-            user_obj = User(user['_id'])
+            user_obj = User(user['username'])
             login_user(user_obj)
             flash("Logged in successfully!", category='success')
             return redirect(request.args.get("next") or url_for("write"))
@@ -28,8 +28,9 @@ def login():
 def register():
     form = RegisterationForm()
     if form.validate_on_submit():
-        User(username = form.username.data,
-             ).new_user(password = form.password.data,
+        User(form.username.data).new_user(
+             username = form.username.data,
+             password = form.password.data,
              email = form.email.data)
         return redirect(request.args.get("next") or url_for("login"))
     return render_template('register.html', form=form)       
@@ -55,7 +56,7 @@ def settings():
 
 @lm.user_loader
 def load_user(username):
-    u = app.config['USERS_COLLECTION'].find_one({"_id": username})
+    u = app.config['USERS_COLLECTION'].find_one({"username": username})
     if not u:
         return None
-    return User(u['_id'])
+    return User(u['username'])

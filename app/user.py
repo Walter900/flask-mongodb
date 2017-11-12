@@ -11,9 +11,9 @@ class User():
         #self.email = None
         self.db = pymongo.MongoClient("localhost", 27017)['blog'].users
 
-    def new_user(self, email, password):
+    def new_user(self, username, email, password):
         collection = {
-            '_id': self.username,
+            'username': username,
             'email': email,
             'password': encrypt_passowrd(password)
         }
