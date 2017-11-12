@@ -24,6 +24,8 @@ class RegisterationForm(Form):
 
   email = StringField('Email', validators=[Required(), Length(1, 64),
                                           Email()])
+
+  about_me = TextAreaField('Self - Introduction')
   #about_me = TextAreaField('Self - Introduction')
 
   submit = SubmitField('submit') 

@@ -2,7 +2,7 @@ from app import app, lm
 from flask import request, redirect, render_template, url_for, flash
 from flask.ext.login import login_user, logout_user, login_required
 from .forms import LoginForm, RegisterationForm
-from .user import User
+from .model import User, Temp
 import pymongo 
 
 @app.route('/')
@@ -16,7 +16,11 @@ def login():
     if request.method == 'POST' and form.validate_on_submit():
         user = app.config['USERS_COLLECTION'].find_one({"email": form.email.data})      
         if user and User.validate_login(user['password'], form.password.data):
-            user_obj = User(user['username'])
+            user_obj = Temp(id = user['_id'],
+                            username = user['username'],
+                            email = user['email'],
+                            password  = user['password'],
+                            about_me = user['about_me'])
             login_user(user_obj)
             flash("Logged in successfully!", category='success')
             return redirect(request.args.get("next") or url_for("write"))
@@ -28,10 +32,11 @@ def login():
 def register():
     form = RegisterationForm()
     if form.validate_on_submit():
-        User(form.username.data).new_user(
-             username = form.username.data,
+        User(username = form.username.data,
              password = form.password.data,
-             email = form.email.data)
+             email = form.email.data,
+             about_me=form.about_me.data
+            ).new_user()
         return redirect(request.args.get("next") or url_for("login"))
     return render_template('register.html', form=form)       
 
@@ -59,4 +64,4 @@ def load_user(username):
     u = app.config['USERS_COLLECTION'].find_one({"username": username})
     if not u:
         return None
-    return User(u['username'])
+    return User(u['username'],u['email'],u['password'],u['about_me'])

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title> profile</title>
+</head>
+<body>
+    <a href = "{{ url_for('index') }}">Home</a>
+    <hr>
+    <form>
+    <!-- ur and li is a way to show the message -->
+    <ur>
+       <li>User Name : {{ username }} </li>
+       <li>User Email :  {{ email }} </li>
+    </ur>
+    <hr>
+</body>
+
+
+
+
+
+{% endblock %}
