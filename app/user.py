@@ -11,7 +11,7 @@ class User():
 
     def new_user(self, username, email, password):
         collection = {
-            'username': self.username,
+            'username': username,
             'email': email,
             'password': encrypt_passowrd(password)
         }
