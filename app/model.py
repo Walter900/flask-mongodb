@@ -9,7 +9,7 @@ class User():
     def __init__(self):
         self.db = pymongo.MongoClient("localhost", 27017)['blog'].users
 
-    def new_user(self, username, email, password):
+    def new_user(self, email, password):
         collection = {
             'username': username,
             'email': email,
