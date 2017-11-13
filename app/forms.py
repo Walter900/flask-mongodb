@@ -29,3 +29,8 @@ class RegisterationForm(Form):
   #about_me = TextAreaField('Self - Introduction')
 
   submit = SubmitField('submit') 
+
+class EditProfileForm(Form):
+    username = StringField('User Name', validators=[DataRequired()])
+    about_me = TextAreaField('Self Introduction')
+    submit = SubmitField('submit')
