@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Selec
 from flask_wtf import Form
 from wtforms import SubmitField, StringField, PasswordField
 from wtforms.validators import DataRequired, EqualTo, Required, Length, Email, Regexp, EqualTo
+from flask_pagedown.fields import PageDownField
 import pymongo 
 
 
@@ -34,3 +35,7 @@ class EditProfileForm(Form):
     username = StringField('User Name', validators=[DataRequired()])
     about_me = TextAreaField('Self Introduction')
     submit = SubmitField('submit')
+
+class PostForm(Form):
+    body = PageDownField('Say somthing.', validators=[Required()])
+    submit = SubmitField('Post')

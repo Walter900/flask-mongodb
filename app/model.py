@@ -1,4 +1,7 @@
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask.ext.login import login_user, logout_user, login_required, current_user
+from datetime import datetime
+from pymongo import MongoClient
 import pymongo
 
 def encrypt_passowrd(password):
@@ -65,3 +68,19 @@ class Temp():
     @staticmethod
     def validate_login(password_hash, password):
         return check_password_hash(password_hash, password)
+
+class Post:
+    def __init__(self, body):
+        self.body = body
+
+    def new_article(self):
+        collection = {
+            'username': current_user.username,
+            'user_id': current_user.id,
+            'body': self.body,
+            'issuing_time': datetime.utcnow(),
+        }
+        MongoClient().blog.aritical.insert(collection)
+
+
+

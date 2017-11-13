@@ -15,10 +15,15 @@ table tr td,th{border:1px solid #000;}
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
   <h1>Welcome</h1>
-  <a href = "{{ url_for('login') }}">Login</a>
-  <span>or</span>
-  <strong>go to</strong>
-  <a href = "{{ url_for('register') }}">register</a>
+   <hr>
+    <div class="posts">
+      {% for post in posts %}
+       <font size="3" color="black">{{ post.body }}</font><br />
+       <a>@{{ post.username }} </a><font size="1" color="black">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;issue time : {{ post.issuing_time }}</font>
+        <hr>
+      {% endfor %}
+    </div>
+    <hr>
   {% for message in get_flashed_messages() %}
     <div class=flash>{{ message }}</div>
   {% endfor %}

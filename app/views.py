@@ -1,18 +1,25 @@
 from app import app, lm
 from flask import request, redirect, render_template, url_for, flash
 from flask.ext.login import login_user, logout_user, login_required, current_user
-from .forms import LoginForm, RegisterationForm, EditProfileForm
-from .model import User, Temp
-from pymongo import MongoClient
+from .forms import LoginForm, RegisterationForm, EditProfileForm, PostForm
+from .model import User, Temp, Post
+from pymongo import MongoClient, DESCENDING
+from datetime import datetime
 
-@app.route('/')
+@app.route('/home', methods=['GET', 'POST'])
+@login_required
 def home():
-    return render_template('home.html')
+    form = PostForm()
+    if form.validate_on_submit():
+       Post(body=form.body.data).new_article()
+       return redirect(request.args.get("next") or url_for("index"))
+    return render_template('home.html', form=form)
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    posts = MongoClient().blog.aritical.find().sort('issuing_time', DESCENDING)
+    return render_template('index.html', posts = posts)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -27,7 +34,7 @@ def login():
                             about_me = user['about_me'])
             login_user(user_obj)
             flash("Logged in successfully!", category='success')
-            return redirect(request.args.get("next") or url_for("write"))
+            return redirect(request.args.get("next") or url_for("home"))
         flash("Wrong username or password!", category='error')
     return render_template('login.html', title='login', form=form)
 
@@ -41,6 +48,7 @@ def register():
              email = form.email.data,
              about_me=form.about_me.data
             ).new_user()
+        flash("Register successfully!", category='success')
         return redirect(request.args.get("next") or url_for("index"))
     return render_template('register.html', form=form)       
 
@@ -74,6 +82,9 @@ def edit_profile():
     return render_template('edit_profile.html', form=form)
 
 
+
+
+
 @app.route('/logout')
 def logout():
     logout_user()
@@ -97,4 +108,4 @@ def load_user(username):
     u = app.config['USERS_COLLECTION'].find_one({"username": username})
     if not u:
         return None
-    return User(u['username'],u['email'],u['password'],u['about_me'])
+    return Temp(u['_id'],u['username'],u['email'],u['password'],u['about_me'])
