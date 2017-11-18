@@ -14,6 +14,7 @@ class User():
         self.email = email
         self.password = password
         self.about_me = about_me
+        self.avatar = ''
         self.db = pymongo.MongoClient("localhost", 27017)['blog'].users
 
     def new_user(self):
@@ -21,7 +22,8 @@ class User():
             'username': self.username,
             'email': self.email,
             'password': encrypt_passowrd(self.password),
-            'about_me': self.about_me
+            'about_me': self.about_me,
+            'avatar': self.avatar
 
         }
         self.db.insert(collection)
@@ -51,7 +53,7 @@ class Temp():
         self.username = username
         self.email = email
         self.password_hash = password
-        about_me = about_me
+        self.about_me = about_me
 
     def is_authenticated(self):
         return True

@@ -2,7 +2,12 @@
 
 {% block content %}
 <body>
-   <h1>Register</h1>  
+   <h1>Register</h1>
+    <img id="avatar-img" src="/static/image/user.png"><br />
+    <form action="" method=post enctype=multipart/form-data>
+        <input class="file_input" type="file" name="avatar"><br />
+    </form>
+    <title>Upload new File</title>
     <form method = 'post'>
         {{ form.csrf_token() }}
         <p>{{ form.username.label }} <br /> {{ form.username }}</p>       

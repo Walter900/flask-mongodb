@@ -2,6 +2,7 @@
 
 {% block content %}
 
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -16,10 +17,66 @@
        <li>User Name : {{ username }} </li>
        <li>User Email :  {{ email }} </li>
        <li>About me :  {{ about_me }} </li>
+       <li>Avatar :  {{ avatar }} </li>
     </ur>
     <hr>
 </body>
+<div class="ui small image" id="avatar">
+  <style>
+    #avatar-img {
+        height: 60px;
+        width: 60px;
+    }
 
+    #avatar-img img {
+        height: 50%;
+        width: 50%;
+    }
+
+    .circular.segment {
+        height: 175px;
+        width: 175px;
+    }
+</style>
+              {% if avatar %}
+                <style>
+    #avatar-img {
+        height: 60px;
+        width: 60px;
+    }
+
+    #avatar-img img {
+        height: 50%;
+        width: 50%;
+    }
+
+    .circular.segment {
+        height: 175px;
+        width: 175px;
+    }
+</style>
+                <img id="avatar-img" src="{{ url_for('uploaded_file', avatar=avatar) }}">
+                <style>
+    #avatar-img {
+        height: 60px;
+        width: 60px;
+    }
+
+    #avatar-img img {
+        height: 50%;
+        width: 50%;
+    }
+
+    .circular.segment {
+        height: 175px;
+        width: 175px;
+    }
+</style>
+              {% else %}
+                <img src="/static/image/user.png">
+              {% endif %}
+               <img  id="avatar-img" src="/static/image/user.png">
+</div>
 
 
 

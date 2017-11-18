@@ -39,3 +39,7 @@ class EditProfileForm(Form):
 class PostForm(Form):
     body = PageDownField('Say somthing.', validators=[Required()])
     submit = SubmitField('Post')
+
+
+class testForm(Form):
+    submit = SubmitField('submit') 
