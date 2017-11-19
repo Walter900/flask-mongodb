@@ -23,6 +23,19 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterationForm()
+    if request.method == 'POST':
+       if form.validate_on_submit():
+            User(username = form.username.data,
+                password = form.password.data,
+                email = form.email.data,
+                about_me = form.about_me.data).new_user()
+            
+            flash("Register successfully!", category='success')
+            return redirect(request.args.get("next") or url_for("index"))
+    return render_template('register.html', form=form)       
 
 @app.route('/test', methods=['GET', 'POST'])
 def upload_file():
@@ -43,12 +56,42 @@ def upload_file():
             else:
                 flash('It is not support', 'red')
             
-            return redirect(request.args.get("next") or url_for('test2', avatar_id =avatar_id))
+            return redirect(request.args.get("next") or url_for('test2'))
     return render_template('test.html')
 
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    user = app.config['USERS_COLLECTION'].find_one({"username": current_user.username})
+    if form.validate_on_submit():
+        MongoClient().blog.users.update({'email': current_user.email}, {'$set': {'username': form.username.data}})
+        MongoClient().blog.users.update({'email': current_user.email}, {'$set': {'about_me': form.about_me.data}})
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        name = current_user.username
+        avatar = request.files['file']
+        if avatar and allowed_file(avatar.filename):
+            fs = GridFS(MongoClient().db, collection="avatar")
+            filename = secure_filename(avatar.filename)
+            avatar_id = fs.put(avatar, content_type=avatar.content_type, filename=filename)
 
-@app.route('/test2/<avatar_id>', methods=['GET', 'POST'])
-def test2(avatar_id):
+            if avatar_id:
+                    if user['avatar']:
+                        fs.delete(user['avatar'])
+                    MongoClient().blog.users.update({'email': current_user.email}, {'$set': {'avatar': avatar_id}})
+                    flash('successfully upload image')
+            else:
+                flash('It is not support', 'red')
+
+        flash('Information Changed')
+        return redirect(request.args.get("next") or url_for('profile'))
+    form.username.data = current_user.username
+    form.about_me.data = current_user.about_me
+    return render_template('edit_profile.html', form=form, user = user)
+
+@app.route('/test3/<avatar_id>', methods=['GET', 'POST'])
+def test3(avatar_id):
     avatar_id  =  avatar_id
     u = app.config['USERS_COLLECTION'].find_one({"username": current_user.username})
     avatar = avatar = u['avatar']
@@ -59,7 +102,29 @@ def test2(avatar_id):
     return render_template('test2.html', avatar = avatar, avatar_id= avatar_id)
 
 
+@app.route('/test2', methods=['GET', 'POST'])
+@login_required
+def test2():
+    u = app.config['USERS_COLLECTION'].find_one({"username": current_user.username})
+    avatar_id = u['avatar']
+    avatar = u['avatar']
+    form = testForm()
+    if form.validate_on_submit():
+        render_template('/uploads/<avatar>')
 
+    return render_template('test2.html', avatar = avatar, avatar_id= avatar_id, user = u)
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    u = app.config['USERS_COLLECTION'].find_one({"username": current_user.username})
+    avatar_id = u['avatar']
+    avatar = u['avatar']
+    form = testForm()
+    if form.validate_on_submit():
+        render_template('/uploads/<avatar>')
+
+    return render_template('profile.html', avatar = avatar, avatar_id= avatar_id, user = u) 
 
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
@@ -99,56 +164,6 @@ def login():
     return render_template('login.html', title='login', form=form)
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegisterationForm()
-    if form.validate_on_submit():
-            
-        User(username = form.username.data,
-             password = form.password.data,
-             email = form.email.data,
-             about_me = form.about_me.data
-            ).new_user()
-
-        flash("Register successfully!", category='success')
-        return redirect(request.args.get("next") or url_for("index"))
-    return render_template('register.html', form=form)       
-
-@app.route('/profile')
-@login_required
-def user():
-    u = app.config['USERS_COLLECTION'].find_one({"username": current_user.username})
-    if user == None:
-        flash('User %s not found.' % username)
-        return redirect(url_for(''))
-    username = u['username']
-    email = u['email']
-    about_me = u['about_me']
-    avatar = u['avatar']
-
-    #fs = GridFS(MongoClient().db, "avatar")
-    #img = fs.get(avatar)
-    #data = img.read()
-
-    return render_template('profile.html', username=username, email=email, about_me=about_me,
-        avatar = avatar) 
-
-
-@app.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    form = EditProfileForm()
-    if form.validate_on_submit():
-        MongoClient().blog.users.update({'email': current_user.email}, {'$set': {'username': form.username.data}})
-        MongoClient().blog.users.update({'email': current_user.email}, {'$set': {'about_me': form.about_me.data}})
-        current_user.username = form.username.data
-        current_user.about_me = form.about_me.data
-        name = current_user.username
-        flash('Information Changed')
-        return redirect(request.args.get("next") or url_for('/profile'))
-    form.username.data = current_user.username
-    form.about_me.data = current_user.about_me
-    return render_template('edit_profile.html', form=form)
 
 @app.route('/uploads/<avatar>')
 def uploaded_file(avatar):

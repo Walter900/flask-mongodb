@@ -4,11 +4,8 @@
 <body>
    <h1>Register</h1>
     <img id="avatar-img" src="/static/image/user.png"><br />
-    <form action="" method=post enctype=multipart/form-data>
-        <input class="file_input" type="file" name="avatar"><br />
-    </form>
-    <title>Upload new File</title>
-    <form method = 'post'>
+    <form action="" method="post" enctype="multipart/form-data">
+      <p>upload image</p>
         {{ form.csrf_token() }}
         <p>{{ form.username.label }} <br /> {{ form.username }}</p>       
         <p>{{ form.password.label }} <br /> {{ form.password }}</p>
@@ -16,14 +13,13 @@
         <p>{{ form.email.label }} <br /> {{ form.email }}</p> 
         <p>{{ form.about_me.label }} <br /> {{ form.about_me }}</p> 
         <!-- div is a container that desparate the information -->   
-        <div class="addition">
         <!-- span and strong are for high light -->
-          <button class="btn btn-default" type="submit">Submit</button>
+        <button class="btn btn-default" type="submit">Submit</button>
+    </form>    
+          
           <span>or</span>
           <strong>go to</strong>
           <a href = "{{ url_for('login') }}">login</a>
-        </div>
-    <form>
 </body>
 
 

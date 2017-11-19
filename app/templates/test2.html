@@ -19,6 +19,18 @@
         <h2>You are in homepage!</h2>
         <!doctype html>
     <title>Upload new File</title>
+    <body>
+    <a href = "{{ url_for('index') }}">Home</a>
+    <hr>
+    <form>
+    <!-- ur and li is a way to show the message -->
+    <ur>
+       <li>User Name : {{ user['username'] }} </li>
+       <li>User Email :  {{ user['email'] }} </li>
+       <li>About me :  {{ user['about_me'] }} </li>
+    </ur>
+    <hr>
+</body>
     <h1>avatar</h1>
      <p>{{ avatar  }}</p>
     <h1>avatar id</h1>
