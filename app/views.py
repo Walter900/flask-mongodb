@@ -18,7 +18,6 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -36,28 +35,6 @@ def register():
             flash("Register successfully!", category='success')
             return redirect(request.args.get("next") or url_for("index"))
     return render_template('register.html', form=form)       
-
-@app.route('/test', methods=['GET', 'POST'])
-def upload_file():
-    user = app.config['USERS_COLLECTION'].find_one({"username": current_user.username})
-    if request.method == 'POST':
-
-        avatar = request.files['file']
-        if avatar and allowed_file(avatar.filename):
-            fs = GridFS(MongoClient().db, collection="avatar")
-            filename = secure_filename(avatar.filename)
-            avatar_id = fs.put(avatar, content_type=avatar.content_type, filename=filename)
-
-            if avatar_id:
-                    if user['avatar']:
-                        fs.delete(user['avatar'])
-                    MongoClient().blog.users.update({'email': current_user.email}, {'$set': {'avatar': avatar_id}})
-                    flash('successfully upload image')
-            else:
-                flash('It is not support', 'red')
-            
-            return redirect(request.args.get("next") or url_for('test2'))
-    return render_template('test.html')
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -89,30 +66,6 @@ def edit_profile():
     form.username.data = current_user.username
     form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', form=form, user = user)
-
-@app.route('/test3/<avatar_id>', methods=['GET', 'POST'])
-def test3(avatar_id):
-    avatar_id  =  avatar_id
-    u = app.config['USERS_COLLECTION'].find_one({"username": current_user.username})
-    avatar = avatar = u['avatar']
-    form = testForm()
-    if form.validate_on_submit():
-        render_template('/uploads/<avatar>')
-
-    return render_template('test2.html', avatar = avatar, avatar_id= avatar_id)
-
-
-@app.route('/test2', methods=['GET', 'POST'])
-@login_required
-def test2():
-    u = app.config['USERS_COLLECTION'].find_one({"username": current_user.username})
-    avatar_id = u['avatar']
-    avatar = u['avatar']
-    form = testForm()
-    if form.validate_on_submit():
-        render_template('/uploads/<avatar>')
-
-    return render_template('test2.html', avatar = avatar, avatar_id= avatar_id, user = u)
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -173,44 +126,17 @@ def uploaded_file(avatar):
     try:    
       fs = GridFS(MongoClient().db, 'avatar')
       img = fs.get(bson_obj_id(avatarid))
-      #data = img.read()
       response = make_response(img.read())
       response.headers['Content-Type'] = img.content_type
       return response
     except NoFile:
       abort(404)
 
-@app.route('/static/avatar/<oid>')
-def avatar(oid):
-    oid = avatar
-    if oid is None:
-        return ''
-    try:
-        fs = GridFS(MongoClient().dbs, "avatar")
-        img = fs.get(oid)
-        response = make_response(img.read())
-        response.headers['Content-Type'] = img.content_type
-        return response
-    except NoFile:
-        abort(404)
-
 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('login'))
-
-
-@app.route('/write', methods=['GET', 'POST'])
-@login_required
-def write():
-    return render_template('write.html')
-
-
-@app.route('/settings', methods=['GET', 'POST'])
-@login_required
-def settings():
-    return render_template('settings.html')
 
 
 @lm.user_loader
